@@ -27,23 +27,37 @@
         async function sendMessage() {
             const user_id = document.getElementById("user_id").value;
             const message = document.getElementById("message").value;
+            const button = document.querySelector("button");
             if (!user_id || !message) {
                 alert("User ID and message required.");
                 return;
             }
+            button.disabled = true;  // Disable button to prevent spamming
 
-            const res = await fetch("/chat", {
+            try{
+                const res = await fetch("/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_id, message })
-            });
-            const data = await res.json();
+                });
+                const data = await res.json();
 
-            const chatBox = document.getElementById("chat_box");
-            chatBox.innerHTML += `<div class="message"><span class="user">You:</span> ${data.question}</div>`;
-            chatBox.innerHTML += `<div class="message"><span class="ai">AI:</span> ${data.answer}</div>`;
+                const chatBox = document.getElementById("chat_box");
+                chatBox.innerHTML += `<div class="message"><span class="user">You:</span> ${data.question}</div>`;
+                chatBox.innerHTML += `<div class="message"><span class="ai">AI:</span> ${data.answer}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to latest message
 
-            document.getElementById("message").value = "";
+                document.getElementById("message").value = "";
+        
+
+            } catch (err) {
+                alert("Something went wrong. Try again.");
+                console.error(err);
+            } finally{
+                button.disabled = false; // Re-enable button after response or error
+            }
+
+            
         }
     </script>
 </body>
