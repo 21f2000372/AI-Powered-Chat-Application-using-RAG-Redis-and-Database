@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat with PDF</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input, textarea, button { margin: 10px 0; width: 100%; }
+        .chat-box { margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px; }
+        .message { margin: 10px 0; }
+        .user { font-weight: bold; color: #1a73e8; }
+        .ai { font-weight: bold; color: #34a853; }
+    </style>
+</head>
+<body>
+    <h1>PDF Chat</h1>
+
+    <label>User ID:</label>
+    <input type="text" id="user_id" placeholder="Enter user ID">
+
+    <label>Message:</label>
+    <textarea id="message" rows="3" placeholder="Ask something..."></textarea>
+    <button onclick="sendMessage()">Send</button>
+
+    <div class="chat-box" id="chat_box"></div>
+
+    <script>
+        async function sendMessage() {
+            const user_id = document.getElementById("user_id").value;
+            const message = document.getElementById("message").value;
+            if (!user_id || !message) {
+                alert("User ID and message required.");
+                return;
+            }
+
+            const res = await fetch("/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id, message })
+            });
+            const data = await res.json();
+
+            const chatBox = document.getElementById("chat_box");
+            chatBox.innerHTML += `<div class="message"><span class="user">You:</span> ${data.question}</div>`;
+            chatBox.innerHTML += `<div class="message"><span class="ai">AI:</span> ${data.answer}</div>`;
+
+            document.getElementById("message").value = "";
+        }
+    </script>
+</body>
+</html>
