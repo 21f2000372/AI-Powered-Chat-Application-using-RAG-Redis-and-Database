@@ -29,3 +29,11 @@ def get_messages(user_id):
     rows = cur.fetchall()
     conn.close()
     return [{"question": q, "answer": a} for q, a in rows]
+
+def user_exists(user_id):
+    conn = sqlite3.connect("chat.db")
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM messages WHERE user_id = ? LIMIT 1", (user_id,))
+    exists = cur.fetchone() is not None
+    conn.close()
+    return exists

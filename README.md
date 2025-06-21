@@ -73,6 +73,21 @@ python app.py
 
 🔌 API Endpoints
 
-POST /chat
+1. 🧠 Ask a Question
 
-GET /history/<user_id>
+POST 
+http://127.0.0.1:5000/user_id
+{
+  "user_id": "user12",
+  "message": "Why do we need artificial intelligence?"
+}
+
+2. 🕓 Get User Chat History
+GET 
+[/history/<user_id>]
+
+👨‍💻 Author
+Ananya Chakraborty
+Made for educational and practical use.
+
+

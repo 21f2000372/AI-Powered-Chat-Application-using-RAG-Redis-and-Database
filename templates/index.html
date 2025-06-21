@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat with PDF</title>
+    <title>Welcome to AI-Powered Chat Application</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
         input, textarea, button { margin: 10px 0; width: 100%; }
@@ -23,7 +23,7 @@
 
     <div class="chat-box" id="chat_box"></div>
 
-    <script>
+    <!-- <script>
         async function sendMessage() {
             const user_id = document.getElementById("user_id").value;
             const message = document.getElementById("message").value;
@@ -59,6 +59,80 @@
 
             
         }
+    </script> -->
+    <script>
+         async function sendMessage() {
+            const user_id = document.getElementById("user_id").value.trim();
+            const message = document.getElementById("message").value.trim();
+            const button = document.querySelector("button");
+
+            if (!user_id || !message) {
+                alert("User ID and message required.");
+                return;
+            }
+
+            button.disabled = true;
+
+            try {
+                const res = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ user_id, message })
+                });
+
+                const data = await res.json();
+
+                const chatBox = document.getElementById("chat_box");
+                chatBox.innerHTML += `<div class="message"><span class="user">You:</span> ${data.question}</div>`;
+                chatBox.innerHTML += `<div class="message"><span class="ai">AI:</span> ${data.answer}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                document.getElementById("message").value = "";
+
+            } catch (err) {
+                alert("Something went wrong. Try again.");
+                console.error(err);
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function loadHistory() {
+            const user_id = document.getElementById("user_id").value.trim();
+            const chatBox = document.getElementById("chat_box");
+
+            if (!user_id) {
+                chatBox.innerHTML = "";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/history/${user_id}`);
+                const data = await res.json();
+
+                chatBox.innerHTML = "";
+
+                if (data.user_exists && data.history.length > 0) {
+                    chatBox.innerHTML += `<div class="message"><em>User already exists. Showing previous chats:</em></div>`;
+                    data.history.forEach(msg => {
+                        chatBox.innerHTML += `<div class="message"><span class="user">You:</span> ${msg.question}</div>`;
+                        chatBox.innerHTML += `<div class="message"><span class="ai">AI:</span> ${msg.answer}</div>`;
+                    });
+                } else {
+                    chatBox.innerHTML = `<div class="message"><em>New user. No previous messages found.</em></div>`;
+                }
+
+            } catch (err) {
+                console.error("Error loading history:", err);
+            }
+        }
+
+        // Load history when user ID input changes (debounced)
+        document.getElementById("user_id").addEventListener("input", function () {
+            clearTimeout(this._debounce);
+            this._debounce = setTimeout(() => loadHistory(), 400); // debounce to reduce API calls
+        });
     </script>
+
 </body>
 </html>

@@ -8,6 +8,7 @@ load_dotenv()
 r = redis.Redis(
     host=os.getenv("REDIS_HOST"),
     port=int(os.getenv("REDIS_PORT")),
+    password=os.getenv("REDIS_PASSWORD"),
     decode_responses=True
 )
 
@@ -21,3 +22,4 @@ def get_cached_messages(user_id):
     key = f"chat:{user_id}"
     messages = r.lrange(key, 0, -1)
     return [json.loads(m) for m in messages]
+

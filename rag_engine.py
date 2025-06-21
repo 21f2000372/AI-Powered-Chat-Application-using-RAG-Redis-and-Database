@@ -15,16 +15,33 @@ def read_pdf_text(path):
 
 pdf_text = read_pdf_text("data/sample_doc.pdf")
 
+# def get_rag_answer(query: str) -> str:
+#     prompt = f"Answer the question based on this text:\n\n{pdf_text}\n\nQuestion: {query}"
+    
+#     response = openai.chat.completions.create(
+#         model="gpt-3.5-turbo",
+#         messages=[
+#             {"role": "system", "content": "You are a helpful assistant."},
+#             {"role": "user", "content": prompt}
+#         ]
+#     )
+#     return response.choices[0].message.content
+
 def get_rag_answer(query: str) -> str:
+    from openai import OpenAIError
     prompt = f"Answer the question based on this text:\n\n{pdf_text}\n\nQuestion: {query}"
     
-    response = openai.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content
-
+    try:
+        response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        return response.choices[0].message.content
+    except openai.RateLimitError:
+        return "Rate limit reached. Please try again later."
+    except Exception as e:
+        return f"Error generating response: {str(e)}"
 
